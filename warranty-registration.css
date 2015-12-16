@@ -1,0 +1,23 @@
+.wp-wc-warranty-registration {
+
+}
+
+.wp-wc-warranty-registration div.controls label {
+  min-width: 200px;
+  text-align: right;
+}
+.wp-wc-warranty-registration div.controls input, .wp-wc-warranty-registration div.controls select,
+.wp-wc-warranty-registration div.controls textarea{
+  width:50%;
+}
+@media screen and (max-width: 768px) {
+  .wp-wc-warranty-registration div.controls label {
+    width:100%;
+    clear:both;
+    text-align: left;
+  }
+  .wp-wc-warranty-registration div.controls input, .wp-wc-warranty-registration div.controls select,
+  .wp-wc-warranty-registration div.controls textarea {
+    width:100%;
+  }
+}
