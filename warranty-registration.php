@@ -48,20 +48,22 @@ function wp_wc_wr_show_warranty_form() {
   wp_enqueue_style('wp-wc-warranty-registration', plugins_url('/warranty-registration.css', __FILE__));
 
 
-  $username = sanitize_user( filter_input(INPUT_POST, 'username'));
-  $firstname = filter_input(INPUT_POST, 'firstname');
-  $lastname = filter_input(INPUT_POST, 'lastname');
-  $email = sanitize_email(filter_input(INPUT_POST, 'email'));
-  $address = filter_input(INPUT_POST, 'address');
-  $city = filter_input(INPUT_POST, 'city');
-  $state = filter_input(INPUT_POST, 'state');
-  $postalcode = filter_input(INPUT_POST, 'postalcode');
-  $country = filter_input(INPUT_POST, 'country');
-  $phone = filter_input(INPUT_POST, 'phone');
-  $product_id = filter_input(INPUT_POST, 'product');
-  $serial_number = filter_input(INPUT_POST, 'serialnumber');
+  $username = sanitize_user( filter_input(INPUT_POST, 'wr-username'));
+  $firstname = filter_input(INPUT_POST, 'wr-firstname');
+  $lastname = filter_input(INPUT_POST, 'wr-lastname');
+  $email = sanitize_email(filter_input(INPUT_POST, 'wr-email'));
+  $address = filter_input(INPUT_POST, 'wr-address');
+  $city = filter_input(INPUT_POST, 'wr-city');
+  $state = filter_input(INPUT_POST, 'wr-state');
+  $postalcode = filter_input(INPUT_POST, 'wr-postalcode');
+  $country = filter_input(INPUT_POST, 'wr-country');
+  $phone = filter_input(INPUT_POST, 'wr-phone');
+  $product_id = filter_input(INPUT_POST, 'wr-product');
+  $serial_number = filter_input(INPUT_POST, 'wr-serialnumber');
+  $submit = $_POST['wr-submit'];
+  if(isset($submit)){
 
-  if(((isset($email) && $email != '') || $current_user) && $product_id != ''){
+    die(var_dump($_POST));
     //process form
     if(!$current_user)
       $user = register_new_user($username, $email);
@@ -88,15 +90,15 @@ function wp_wc_wr_show_warranty_form() {
         'serial_number' => $serial_number
       ));
     } else {
-
+      echo '<div class="error">'.$user->get_error_message().'</div>';
     }
   }
 
-  if($ret){
+  if(isset($ret) && $ret){
     echo '<p>Thank you!</p>';
     return;
   }
-    echo '<div data-ng-app="warranty-registration-app" ><form action="' . $_SERVER['REQUEST_URI'] . '" method="POST" class="wp-wc-warranty-registration" data-ng-controller="WarrantyRegistration as wr">';
+    echo '<div data-ng-app="warranty-registration-app" ><form action="' . esc_url( $_SERVER['REQUEST_URI'] ) . '" method="POST" class="wp-wc-warranty-registration" data-ng-controller="WarrantyRegistration as wr">';
 
     //show form
     echo '
@@ -104,51 +106,51 @@ function wp_wc_wr_show_warranty_form() {
   <legend>About You</legend>
     <div class="controls">
       <label for="username">Username *:</label>
-      <input type="text" name="username" id="username" required value="'. ($current_user ? $current_user->display_name : '') .'" />
+      <input type="text" name="wr-username" id="username" required value="'. ($current_user ? $current_user->display_name : '') .'" />
     </div>
     <div class="controls">
       <label for="email">Email *:</label>
-      <input type="email" name="email" id="email" value="'.($current_user ? $current_user->get('user_email') : '').'" />
+      <input type="email" name="wr-email" id="email" value="'.($current_user ? $current_user->get('user_email') : '').'" />
     </div>
     <div class="controls">
       <label for="firstname">First name *:</label>
-      <input type="text" name="firstname" id="firstname" value="' . ($current_user ? $current_user->get('first_name') : ''). '" />
+      <input type="text" name="wr-firstname" id="firstname" value="' . ($current_user ? $current_user->get('first_name') : ''). '" />
     </div>
     <div class="controls">
       <label for="lastname">Last name *:</label>
-      <input type="text" name="lastname" id="lastname" value="' . ($current_user ? $current_user->get('last_name'): '') . '" />
+      <input type="text" name="wr-lastname" id="lastname" value="' . ($current_user ? $current_user->get('last_name'): '') . '" />
     </div>
     <div class="controls">
       <label for="address">Address:</label>
-      <input type="text" name="address" id="address" value="'. ($current_user ? $current_user->get('address') : '').'" />
+      <input type="text" name="wr-address" id="address" value="'. ($current_user ? $current_user->get('address') : '').'" />
     </div>
     <div class="controls">
       <label for="city">City:</label>
-      <input type="text" name="city" id="city" value="'. ($current_user ? $current_user->get('city') : '') .'" />
+      <input type="text" name="wr-city" id="city" value="'. ($current_user ? $current_user->get('city') : '') .'" />
     </div>
     <div class="controls">
       <label for="state">State/Province:</label>
-      <input name="state" id="state" value="'. ($current_user ? $current_user->get('state') : '') .'" />
+      <input name="wr-state" id="state" value="'. ($current_user ? $current_user->get('state') : '') .'" />
 
     </div>
     <div class="controls">
       <label for="postalcode">Postal Code:</label>
-      <input name="postalcode" id="postalcode" value="'. ($current_user ? $current_user->get('postalcode') : '').'" />
+      <input name="wr-postalcode" id="postalcode" value="'. ($current_user ? $current_user->get('postalcode') : '').'" />
     </div>
     <div class="controls">
       <label for="country">Country:</label>
-      <input name="country" id="country" value="'.($current_user ? $current_user->get('country') : '').'" />
+      <input name="wr-country" id="country" value="'.($current_user ? $current_user->get('country') : '').'" />
     </div>
     <div class="controls">
       <label for="phone">Phone:</label>
-      <input name="phone" id="phone" value="'.($current_user ? $current_user->get('phone') : '') .'" />
+      <input name="wr-phone" id="phone" value="'.($current_user ? $current_user->get('phone') : '') .'" />
     </div>
 </fieldset>
 <fieldset>
   <legend>About the Product</legend>
   <div class="controls">
     <label for="product">Product: </label>
-    <select name="product" id="product" value="">
+    <select name="wr-product" id="product" value="">
       <option value="-1"></option>
   ';
     $args = array('post_type' => 'product', 'number_posts' => 1000, 'orderby' => 'post_title', 'order' => 'ASC');
@@ -161,21 +163,22 @@ function wp_wc_wr_show_warranty_form() {
   </div>
   <div class="controls">
     <label for="serialnumber">Serial Number<strong>*</strong>:</label>
-    <input type="text" required id="serialnumber" name="serialnumber" />
+    <input type="text" required id="serialnumber" name="wr-serialnumber" />
   </div>
   <div class="controls">
     <label for="purchasedate">Purchase Date:</label>
-    <input type="text" name="purchasedate" id="purchasedate" class="datepicker"/>
+    <input type="text" name="wr-purchasedate" id="purchasedate" class="datepicker"/>
   </div>
   <div class="controls">
     <label for="purchaselocation">Purchase Location:</label>
-    <input type="text" name="purchaselocation" id="purchaselocation" />
+    <input type="text" name="wr-purchaselocation" id="purchaselocation" />
   </div>
   <div class="controls">
     <label for="comments">Comments:</label>
-    <textarea name="comments" id="comments"></textarea>
+    <textarea name="wr-comments" id="comments"></textarea>
   </div>
 </fieldset>
+  <input type="submit" value="Submit" name="wr-submit"/>
 </form>
 </div>
     ';
