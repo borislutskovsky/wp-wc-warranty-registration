@@ -44,7 +44,7 @@ function wp_wc_wr_generateUsername($firstname, $lastname){
 
 function wp_wc_wr_show_warranty_form() {
   global $wpdb, $current_user;
-
+  ob_start();
   wp_enqueue_style('wp-wc-warranty-registration', plugins_url('/warranty-registration.css', __FILE__));
 
 
@@ -56,18 +56,20 @@ function wp_wc_wr_show_warranty_form() {
   $city = filter_input(INPUT_POST, 'wr-city');
   $state = filter_input(INPUT_POST, 'wr-state');
   $postalcode = filter_input(INPUT_POST, 'wr-postalcode');
+  $purchasedate = filter_input(INPUT_POST, 'wr-purchasedate');
+  $location = filter_input(INPUT_POST, 'wr-purchaselocation');
+  $comments = filter_input(INPUT_POST, 'wr-comments');
   $country = filter_input(INPUT_POST, 'wr-country');
   $phone = filter_input(INPUT_POST, 'wr-phone');
   $product_id = filter_input(INPUT_POST, 'wr-product');
   $serial_number = filter_input(INPUT_POST, 'wr-serialnumber');
-  $submit = $_POST['wr-submit'];
-  if(isset($submit)){
 
-    die(var_dump($_POST));
+  if(isset($_POST['wr-submit']) && $_POST['wr-submit'] == 'Submit'){
+
     //process form
-    if(!$current_user)
-      $user = register_new_user($username, $email);
-    else {
+    if(!is_user_logged_in()) {
+      $user = register_new_user( $username, $email );
+    } else {
       $user = $current_user->ID;
     }
     $_pf = new WC_Product_Factory();
@@ -75,6 +77,8 @@ function wp_wc_wr_show_warranty_form() {
     if ( ! is_wp_error( $user ) ) {
 
       //save user meta
+      update_user_meta($user, 'firstname', $firstname);
+      update_user_meta($user, 'lastname', $lastname);
       update_user_meta($user, 'address', $address);
       update_user_meta($user, 'city', $city);
       update_user_meta($user, 'state', $state);
@@ -87,8 +91,12 @@ function wp_wc_wr_show_warranty_form() {
         'user_id' => $user,
         'product_id' => $product_id,
         'product_name' =>$product->post_title,
-        'serial_number' => $serial_number
+        'serial_number' => $serial_number,
+        'purchase_date' => date('Y-m-d', strtotime($purchasedate)),
+        'purchase_location' => $location,
+        'comments' => $comments
       ));
+      echo $wpdb->last_query;
     } else {
       echo '<div class="error">'.$user->get_error_message().'</div>';
     }
@@ -96,7 +104,8 @@ function wp_wc_wr_show_warranty_form() {
 
   if(isset($ret) && $ret){
     echo '<p>Thank you!</p>';
-    return;
+    echo var_dump($_POST);
+    return ob_get_clean();
   }
     echo '<div data-ng-app="warranty-registration-app" ><form action="' . esc_url( $_SERVER['REQUEST_URI'] ) . '" method="POST" class="wp-wc-warranty-registration" data-ng-controller="WarrantyRegistration as wr">';
 
@@ -106,44 +115,44 @@ function wp_wc_wr_show_warranty_form() {
   <legend>About You</legend>
     <div class="controls">
       <label for="username">Username *:</label>
-      <input type="text" name="wr-username" id="username" required value="'. ($current_user ? $current_user->display_name : '') .'" />
+      <input type="text" name="wr-username" id="username" required value="'. (is_user_logged_in() ? $current_user->display_name : $username) .'" />
     </div>
     <div class="controls">
       <label for="email">Email *:</label>
-      <input type="email" name="wr-email" id="email" value="'.($current_user ? $current_user->get('user_email') : '').'" />
+      <input type="email" name="wr-email" id="email" value="'.(is_user_logged_in() ? $current_user->get('user_email') : $email).'" />
     </div>
     <div class="controls">
       <label for="firstname">First name *:</label>
-      <input type="text" name="wr-firstname" id="firstname" value="' . ($current_user ? $current_user->get('first_name') : ''). '" />
+      <input type="text" name="wr-firstname" id="firstname" value="' . (is_user_logged_in() ? $current_user->get('first_name') : $firstname). '" />
     </div>
     <div class="controls">
       <label for="lastname">Last name *:</label>
-      <input type="text" name="wr-lastname" id="lastname" value="' . ($current_user ? $current_user->get('last_name'): '') . '" />
+      <input type="text" name="wr-lastname" id="lastname" value="' . (is_user_logged_in() ? $current_user->get('last_name'): $lastname) . '" />
     </div>
     <div class="controls">
       <label for="address">Address:</label>
-      <input type="text" name="wr-address" id="address" value="'. ($current_user ? $current_user->get('address') : '').'" />
+      <input type="text" name="wr-address" id="address" value="'. (is_user_logged_in() ? $current_user->get('address') : $address).'" />
     </div>
     <div class="controls">
       <label for="city">City:</label>
-      <input type="text" name="wr-city" id="city" value="'. ($current_user ? $current_user->get('city') : '') .'" />
+      <input type="text" name="wr-city" id="city" value="'. (is_user_logged_in() ? $current_user->get('city') : $city) .'" />
     </div>
     <div class="controls">
       <label for="state">State/Province:</label>
-      <input name="wr-state" id="state" value="'. ($current_user ? $current_user->get('state') : '') .'" />
+      <input name="wr-state" id="state" value="'. (is_user_logged_in() ? $current_user->get('state') : $state) .'" />
 
     </div>
     <div class="controls">
       <label for="postalcode">Postal Code:</label>
-      <input name="wr-postalcode" id="postalcode" value="'. ($current_user ? $current_user->get('postalcode') : '').'" />
+      <input name="wr-postalcode" id="postalcode" value="'. (is_user_logged_in() ? $current_user->get('postalcode') : $postalcode).'" />
     </div>
     <div class="controls">
       <label for="country">Country:</label>
-      <input name="wr-country" id="country" value="'.($current_user ? $current_user->get('country') : '').'" />
+      <input name="wr-country" id="country" value="'.(is_user_logged_in() ? $current_user->get('country') : $country).'" />
     </div>
     <div class="controls">
       <label for="phone">Phone:</label>
-      <input name="wr-phone" id="phone" value="'.($current_user ? $current_user->get('phone') : '') .'" />
+      <input name="wr-phone" id="phone" value="'.(is_user_logged_in() ? $current_user->get('phone') : $phone) .'" />
     </div>
 </fieldset>
 <fieldset>
@@ -156,26 +165,26 @@ function wp_wc_wr_show_warranty_form() {
     $args = array('post_type' => 'product', 'number_posts' => 1000, 'orderby' => 'post_title', 'order' => 'ASC');
     $products = get_posts($args);
     foreach($products as $p){
-      echo '<option value="'.$p->ID.'">'.$p->post_title.'</option>';
+      echo '<option value="'.$p->ID.'" '.($p->ID == $product_id ? " selected " : "").' >'.$p->post_title.'</option>';
     }
   echo '
     </select>
   </div>
   <div class="controls">
     <label for="serialnumber">Serial Number<strong>*</strong>:</label>
-    <input type="text" required id="serialnumber" name="wr-serialnumber" />
+    <input type="text" required id="serialnumber" name="wr-serialnumber" value="'.$serial_number.'" />
   </div>
   <div class="controls">
     <label for="purchasedate">Purchase Date:</label>
-    <input type="text" name="wr-purchasedate" id="purchasedate" class="datepicker"/>
+    <input type="text" name="wr-purchasedate" id="purchasedate" class="datepicker" value="'.$purchasedate.'"/>
   </div>
   <div class="controls">
     <label for="purchaselocation">Purchase Location:</label>
-    <input type="text" name="wr-purchaselocation" id="purchaselocation" />
+    <input type="text" name="wr-purchaselocation" id="purchaselocation" value="'.$location.'" />
   </div>
   <div class="controls">
     <label for="comments">Comments:</label>
-    <textarea name="wr-comments" id="comments"></textarea>
+    <textarea name="wr-comments" id="comments">'.$comments.'</textarea>
   </div>
 </fieldset>
   <input type="submit" value="Submit" name="wr-submit"/>
@@ -186,5 +195,23 @@ function wp_wc_wr_show_warranty_form() {
   wp_enqueue_script('wp-wc-warranty-registration', plugins_url('/warranty-registration.js', __FILE__), array('angular'));
 
 
+  return ob_get_clean();
 }
 add_shortcode('wp_wc_wr_form', 'wp_wc_wr_show_warranty_form');
+
+
+
+add_action('admin_menu', 'wp_wc_wr_admin_page');
+function wp_wc_wr_admin_page(){
+  add_menu_page('Warranty Registration', 'Warranty', 'manage_options',  'wp-wc-warranty-registration',
+    'wp_wc_wr_plugin_admin', 'dashicons-clipboard');
+  add_submenu_page('wp-wc-warranty-registration', 'Warranty Registrations', 'Registrations', 'manage_options', 'wp_wc_wr_plugin_registrations', 'wp_wc_wr_plugin_registrations');
+}
+
+function wp_wc_wr_plugin_registrations(){
+  require('admin/registrations.php');
+}
+
+function wp_wc_wr_plugin_admin(){
+  require('admin/admin.php');
+}
