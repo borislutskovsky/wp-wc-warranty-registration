@@ -1,6 +1,6 @@
 <?php
 /*
- * Plugin Name: WooCommerce Warranty Registration
+ * Plugin Name: WooCommerce Product Warranty Registration
  * Description: a plugin that allows users to register their warranty for products
  * Version: 1.0
  * Author: Boris Lutskovsky
@@ -24,7 +24,9 @@ function wp_wc_warranty_registration_install(){
           serial_number varchar(64) NOT NULL,
           purchase_date DATE NOT NULL,
           purchase_location VARCHAR(128) NOT NULL,
-          comments TEXT
+          comments TEXT,
+          created_date DATETIME NOT NULL,
+          PRIMARY KEY (id)
   ) $charset_collate;";
 
   require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
@@ -94,7 +96,8 @@ function wp_wc_wr_show_warranty_form() {
         'serial_number' => $serial_number,
         'purchase_date' => date('Y-m-d', strtotime($purchasedate)),
         'purchase_location' => $location,
-        'comments' => $comments
+        'comments' => $comments,
+        'created_date' => date('Y-m-d H:i:s')
       ));
       echo $wpdb->last_query;
     } else {

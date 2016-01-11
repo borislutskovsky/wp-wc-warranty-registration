@@ -28,7 +28,9 @@
     }
 
     public function get_sortable_columns() {
-     return $sortable = array
+     return $sortable = array(
+
+     );
     }
   }
 ?>
