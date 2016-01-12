@@ -99,7 +99,7 @@ function wp_wc_wr_show_warranty_form() {
         'comments' => $comments,
         'created_date' => date('Y-m-d H:i:s')
       ));
-      echo $wpdb->last_query;
+      //echo $wpdb->last_query;
     } else {
       echo '<div class="error">'.$user->get_error_message().'</div>';
     }
@@ -107,7 +107,7 @@ function wp_wc_wr_show_warranty_form() {
 
   if(isset($ret) && $ret){
     echo '<p>Thank you!</p>';
-    echo var_dump($_POST);
+    //echo var_dump($_POST);
     return ob_get_clean();
   }
     echo '<div data-ng-app="warranty-registration-app" ><form action="' . esc_url( $_SERVER['REQUEST_URI'] ) . '" method="POST" class="wp-wc-warranty-registration" data-ng-controller="WarrantyRegistration as wr">';
