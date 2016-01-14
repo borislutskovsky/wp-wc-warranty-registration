@@ -104,10 +104,17 @@ function wp_wc_wr_show_warranty_form() {
       echo '<div class="error">'.$user->get_error_message().'</div>';
     }
   }
-
   if(isset($ret) && $ret){
-    echo '<p>Thank you!</p>';
+   
     //echo var_dump($_POST);
+    $thankyou_file = 'templates/warranty-registration-thank-you.php';
+    if(file_exists(get_template_directory()."/woocommerce/$thankyou_file")){
+      require_once(get_template_directory()."/woocommerce/$thankyou_file");
+    } else {
+      require_once($thankyou_file);
+    }
+
+
     return ob_get_clean();
   }
     echo '<div data-ng-app="warranty-registration-app" ><form action="' . esc_url( $_SERVER['REQUEST_URI'] ) . '" method="POST" class="wp-wc-warranty-registration" data-ng-controller="WarrantyRegistration as wr">';
