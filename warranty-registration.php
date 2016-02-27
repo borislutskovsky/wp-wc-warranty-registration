@@ -79,8 +79,8 @@ function wp_wc_wr_show_warranty_form() {
     if ( ! is_wp_error( $user ) ) {
 
       //save user meta
-      update_user_meta($user, 'firstname', $firstname);
-      update_user_meta($user, 'lastname', $lastname);
+      update_user_meta($user, 'first_name', $firstname);
+      update_user_meta($user, 'last_name', $lastname);
       update_user_meta($user, 'address', $address);
       update_user_meta($user, 'city', $city);
       update_user_meta($user, 'state', $state);

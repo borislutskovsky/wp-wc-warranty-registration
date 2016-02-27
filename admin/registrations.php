@@ -7,7 +7,10 @@
  */
 
   class WCRegistrationsTable extends WP_List_Table {
+
+    var $productFactory;
     function __construct() {
+      $this->productFactory = new WC_Product_Factory();
       parent::__construct(array(
         'singular' => 'Registration',
         'plural' => 'Registrations',
@@ -47,9 +50,15 @@
         case 'registration_id':
           return $item['id'];
         case 'user':
-          return $item['user_id'];
+          $user = new WP_User($item['user_id']);
+          return "{$user->first_name} {$user->last_name}";
         case 'product':
-          return $item['product_id'];
+          $product = $this->productFactory->get_product($item['product_id']);
+          if($product)
+            return $product->get_formatted_name();
+          else
+            return var_dump($product);
+
         default:
           return $item[$column_name];
       }
