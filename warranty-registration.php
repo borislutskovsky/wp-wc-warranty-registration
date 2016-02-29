@@ -35,8 +35,16 @@ function wp_wc_warranty_registration_install(){
   add_option('wp_wc_wr_version', $wp_wc_wr_version);
 
 }
+function wp_wc_warranty_registration_uninstall() {
+  global $wpdb, $wp_wc_wr_version;
+
+  $table_name = $wpdb->prefix . 'wc_wr_registrations';
+  delete_option('wp_wc_wr_version');
+  $wpdb->query("DROP TABLE IF EXISTS $table_name");
+}
 
 register_activation_hook(__FILE__, 'wp_wc_warranty_registration_install');
+register_uninstall_hook(__FILE__, 'wp_wc_warranty_registration_uninstall');
 
 function wp_wc_wr_generateUsername($firstname, $lastname){
   $username = '';
@@ -216,6 +224,11 @@ function wp_wc_wr_admin_page(){
   add_menu_page('Warranty Registration', 'Warranty', 'manage_options',  'wp-wc-warranty-registration',
     'wp_wc_wr_plugin_admin', 'dashicons-clipboard');
   add_submenu_page('wp-wc-warranty-registration', 'Warranty Registrations', 'Registrations', 'manage_options', 'wp_wc_wr_plugin_registrations', 'wp_wc_wr_plugin_registrations');
+  add_submenu_page('wp-wc-warranty-registration', 'Warranty Registrations', 'Import', 'manage_options', 'wp_wc_wr_plugin_import', 'wp_wc_wr_plugin_import');
+}
+
+function wp_wc_wr_plugin_import(){
+  require('admin/import.php');
 }
 
 function wp_wc_wr_plugin_registrations(){
