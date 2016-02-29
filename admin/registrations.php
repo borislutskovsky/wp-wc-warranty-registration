@@ -73,12 +73,25 @@
 
       $this->_column_headers = array($columns, $hidden, $sortable);
 
-      $query = "SELECT * FROM {$wpdb->prefix}wc_wr_registrations";
+      $query = "SELECT r.* FROM {$wpdb->prefix}wc_wr_registrations r";
 
       $_orderby = filter_input(INPUT_GET, 'orderby');
       $orderby = !empty($_orderby) ? mysqli_real_escape_string($_orderby) : 'ASC';
       $_order = filter_input(INPUT_GET, 'order');
       $order = !empty($_order) ? mysqli_real_escape_string($_orderby) : '';
+      $search = filter_input(INPUT_POST, 's');
+      if(!empty($search) && $search != '') {
+        $search = "%$search%";
+        $query .= " INNER JOIN {$wpdb->prefix}users u ON (u.ID = r.user_id)
+                      LEFT OUTER JOIN {$wpdb->prefix}usermeta um_first_name ON (um_first_name.user_id = r.user_id AND um_first_name.meta_key = 'fist_name')
+                      LEFT OUTER JOIN {$wpdb->prefix}usermeta um_last_name ON (um_last_name.user_id = r.user_id AND um_last_name.meta_key = 'last_name')";
+        $query .= $wpdb->prepare(" WHERE  (u.user_login LIKE %s OR u.user_nicename LIKE %s
+                            OR u.user_email LIKE %s OR u.display_name LIKE %s 
+                            OR r.serial_number LIKE %s OR um_first_name.meta_value LIKE %s
+                            OR um_last_name.meta_value LIKE %s)",
+                        $search, $search, $search, $search, $search, $search, $search);
+
+      }
       if(!empty($orderby) & !empty($order)){
         $query.=' ORDER BY '.$orderby.' '.$order;
       }
@@ -102,47 +115,10 @@
         'per_page' => $perpage
       ));
 
+
       $this->items = $wpdb->get_results($query, ARRAY_A);
 
     }
-
-
-//    function display_rows() {
-//      $records = $this->items;
-//
-//      $columns = $this->get_columns();
-//      $hidden = $this->get_hidden_columns();
-//      $ret = '';
-//      if(!empty($records)){
-//        foreach($records as $rec){
-//          $ret .= '<tr id="record_'.$rec->id.'">';
-//          foreach ( $columns as $column_name => $column_display_name ) {
-//
-//            //Style attributes for each col
-//            $class = "class='$column_name column-$column_name'";
-//            $style = "";
-//            if ( in_array( $column_name, $hidden ) ) $style = ' style="display:none;"';
-//            $attributes = $class . $style;
-//
-//            //edit link
-//            $editlink  = '/wp-admin/link.php?action=edit&link_id='.(int)$rec->id;
-//
-//            //Display the cell
-//            switch ( $column_name ) {
-//              case "registration_id":  $ret .= '< td '.$attributes.'>'.stripslashes($rec->id).'< /td>';   break;
-//              case "user": $ret .= '< td '.$attributes.'>'.stripslashes($rec->user_id).'< /td>'; break;
-//              case "product": $ret .= '< td '.$attributes.'>'.stripslashes($rec->product_id).'< /td>'; break;
-//              case "serial_number": $ret .= '< td '.$attributes.'>'.$rec->serial_number.'< /td>'; break;
-//              case "purchase_date": $ret .= '< td '.$attributes.'>'.$rec->purchase_date.'< /td>'; break;
-//            }
-//          }
-//
-//          //Close the line
-//          $ret .= '</tr>';
-//        }
-//      }
-//      return $ret;
-//    }
 
   }
 ?>
@@ -151,10 +127,13 @@
 
   <h3></h3>
   <div>
+
     <?php
       $table = new WCRegistrationsTable();
       $table->prepare_items();
-
+      echo '<form method="post"><p class="search-box">Search registrations by name or serial number</p><br/><br/>';
+      $table->search_box('Search', 'search_id');
+      echo '</form>';
       $table->display();
     ?>
 
