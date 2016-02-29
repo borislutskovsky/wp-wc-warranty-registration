@@ -72,6 +72,7 @@ function wp_wc_wr_show_warranty_form() {
   $country = filter_input(INPUT_POST, 'wr-country');
   $phone = filter_input(INPUT_POST, 'wr-phone');
   $product_id = filter_input(INPUT_POST, 'wr-product');
+  $product_name = filter_input(INPUT_POST, 'wr-product-name');
   $serial_number = filter_input(INPUT_POST, 'wr-serialnumber');
 
   if(isset($_POST['wr-submit']) && $_POST['wr-submit'] == 'Submit'){
@@ -97,10 +98,16 @@ function wp_wc_wr_show_warranty_form() {
       update_user_meta($user, 'phone', $phone);
 
       //save registration:
+      if($product_id == 'other'){
+        $product_id = -1;
+      } else {
+        $product_name = $product->post_title;
+      }
+
       $ret = $wpdb->insert($wpdb->prefix . 'wc_wr_registrations', array(
         'user_id' => $user,
         'product_id' => $product_id,
-        'product_name' =>$product->post_title,
+        'product_name' => $product_name,
         'serial_number' => $serial_number,
         'purchase_date' => date('Y-m-d', strtotime($purchasedate)),
         'purchase_location' => $location,
@@ -125,7 +132,7 @@ function wp_wc_wr_show_warranty_form() {
 
     return ob_get_clean();
   }
-    echo '<div data-ng-app="warranty-registration-app" ><form action="' . esc_url( $_SERVER['REQUEST_URI'] ) . '" method="POST" class="wp-wc-warranty-registration" data-ng-controller="WarrantyRegistration as wr">';
+    echo '<div ><form action="' . esc_url( $_SERVER['REQUEST_URI'] ) . '" method="POST" class="wp-wc-warranty-registration">';
 
     //show form
     echo '
@@ -185,8 +192,14 @@ function wp_wc_wr_show_warranty_form() {
     foreach($products as $p){
       echo '<option value="'.$p->ID.'" '.($p->ID == $product_id ? " selected " : "").' >'.$p->post_title.'</option>';
     }
+    echo '<option value="other" '.($product_id == 'other' ? ' selected ' : '') .'>Other</option>';
   echo '
+      
     </select>
+  </div>
+  <div class="controls" id="product_name_div" style="display:none;">
+    <label for="product_name">Product: </label>
+    <input id="product_name" name="wr-product-name" value="'.$product_name.'" />
   </div>
   <div class="controls">
     <label for="serialnumber">Serial Number<strong>*</strong>:</label>
@@ -210,7 +223,7 @@ function wp_wc_wr_show_warranty_form() {
 </div>
     ';
 
-  wp_enqueue_script('wp-wc-warranty-registration', plugins_url('/warranty-registration.js', __FILE__), array('angular'));
+  wp_enqueue_script('wp-wc-warranty-registration', plugins_url('js/warranty-registration.js', __FILE__), array('angular'));
 
 
   return ob_get_clean();

@@ -53,12 +53,7 @@
           $user = new WP_User($item['user_id']);
           return "{$user->first_name} {$user->last_name}";
         case 'product':
-          $product = $this->productFactory->get_product($item['product_id']);
-          if($product)
-            return $product->get_formatted_name();
-          else
-            return var_dump($product);
-
+          return $item['product_name'];
         default:
           return $item[$column_name];
       }

@@ -1,5 +1,7 @@
 <?php
-
+  if(isset($_POST['wr-import-submit']) && $_POST['wr-import-submit'] == 'Submit'){
+    //file uploaded
+  }
 
 ?>
 
@@ -28,7 +30,7 @@
       </ul></p>
       <label for="file">File:</label>
       <input type="file" name="reg_import"/>
-      <input type="submit"/>
+      <input type="submit" value="wr-import-submit"/>
     </form>
 
   </div>
