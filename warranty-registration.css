@@ -2,6 +2,11 @@
 
 }
 
+.wp-wc-warranty-registration div.error {
+  font-weight:bold;
+  color: #ff7676;
+}
+
 .wp-wc-warranty-registration div.controls label {
   min-width: 200px;
   text-align: right;

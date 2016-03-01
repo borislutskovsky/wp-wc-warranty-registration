@@ -116,7 +116,11 @@ function wp_wc_wr_show_warranty_form() {
       ));
       //echo $wpdb->last_query;
     } else {
-      echo '<div class="error">'.$user->get_error_message().'</div>';
+      $error_code = $user->get_error_code();
+
+      echo var_dump($error_code);
+
+      $error = '<div class="error">'.$user->get_error_message().'</div>';
     }
   }
   if(isset($ret) && $ret){
@@ -132,12 +136,28 @@ function wp_wc_wr_show_warranty_form() {
 
     return ob_get_clean();
   }
+
+  //option to login for existing users
+
+  echo "<p>If you are an existing user, login here. Otherwise fill out the section below.</p>";
+  if(!is_user_logged_in()){
+    wp_login_form();
+  }
     echo '<div ><form action="' . esc_url( $_SERVER['REQUEST_URI'] ) . '" method="POST" class="wp-wc-warranty-registration">';
+
+  switch($error_code){
+    case 'email_exists':
+    case 'username_exists':
+      echo '<div class="error">Looks like you already have an account with us. You can login above, or if you forgot your password, you can reset it here: <a href="'.wp_lostpassword_url().'">reset password</a></div>';
+      break;
+    default:
+      echo $error;
+  }
 
     //show form
     echo '
   <fieldset>
-  <legend>About You</legend>
+  <legend>'. (is_user_logged_in()?'About You':'New User').'  </legend>
     <div class="controls">
       <label for="username">Username *:</label>
       <input type="text" name="wr-username" id="username" required value="'. (is_user_logged_in() ? $current_user->display_name : $username) .'" />
@@ -218,6 +238,16 @@ function wp_wc_wr_show_warranty_form() {
     <textarea name="wr-comments" id="comments">'.$comments.'</textarea>
   </div>
 </fieldset>
+';
+
+  if(function_exists('mc4wp_form_is_submitted') && get_option('wc-wp-wr-newsletter')) {
+  echo '
+  <div class="controls">
+    <label for="newsletter"><input type="checkbox" name="mc4wp-subscribe" value="1"/>Subscribe to newsletter</label>
+
+  </div>';
+  }
+  echo '
   <input type="submit" value="Submit" name="wr-submit"/>
 </form>
 </div>
