@@ -114,7 +114,17 @@ function wp_wc_wr_show_warranty_form() {
         'comments' => $comments,
         'created_date' => date('Y-m-d H:i:s')
       ));
-      //echo $wpdb->last_query;
+      
+      
+      //send email
+      $subject = get_option('wc-wp-wr-email-subject');
+      $from = get_option('wc-wp-wr-email-from');
+      $msg_body_file = 'templates/warranty-registration-success-email.html';
+      if(file_exists(get_template_directory()."/woocommerce/$msg_body_file")){
+        $msg_body_file = get_template_directory()."/woocommerce/$msg_body_file";
+      }
+      $body = file_get_contents($msg_body_file);
+      
     } else {
       $error_code = $user->get_error_code();
 
@@ -125,7 +135,6 @@ function wp_wc_wr_show_warranty_form() {
   }
   if(isset($ret) && $ret){
    
-    //echo var_dump($_POST);
     $thankyou_file = 'templates/warranty-registration-thank-you.php';
     if(file_exists(get_template_directory()."/woocommerce/$thankyou_file")){
       require_once(get_template_directory()."/woocommerce/$thankyou_file");
