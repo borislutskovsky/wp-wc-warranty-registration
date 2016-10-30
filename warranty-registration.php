@@ -114,8 +114,8 @@ function wp_wc_wr_show_warranty_form() {
         'comments' => $comments,
         'created_date' => date('Y-m-d H:i:s')
       ));
-      
-      
+
+
       //send email
       $subject = get_option('wc-wp-wr-email-subject');
       $from = get_option('wc-wp-wr-email-from');
@@ -124,7 +124,9 @@ function wp_wc_wr_show_warranty_form() {
         $msg_body_file = get_template_directory()."/woocommerce/$msg_body_file";
       }
       $body = file_get_contents($msg_body_file);
-      
+
+      wp_mail($email, $subject, $body);
+
     } else {
       $error_code = $user->get_error_code();
 
@@ -134,7 +136,7 @@ function wp_wc_wr_show_warranty_form() {
     }
   }
   if(isset($ret) && $ret){
-   
+
     $thankyou_file = 'templates/warranty-registration-thank-you.php';
     if(file_exists(get_template_directory()."/woocommerce/$thankyou_file")){
       require_once(get_template_directory()."/woocommerce/$thankyou_file");
@@ -223,7 +225,7 @@ function wp_wc_wr_show_warranty_form() {
     }
     echo '<option value="other" '.($product_id == 'other' ? ' selected ' : '') .'>Other</option>';
   echo '
-      
+
     </select>
   </div>
   <div class="controls" id="product_name_div" style="display:none;">
