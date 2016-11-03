@@ -125,7 +125,7 @@ function wp_wc_wr_show_warranty_form() {
       }
       $body = file_get_contents($msg_body_file);
 
-      wp_mail($email, $subject, $body);
+      $ret = wp_mail($email, $subject, $body);
 
     } else {
       $error_code = $user->get_error_code();
@@ -150,8 +150,9 @@ function wp_wc_wr_show_warranty_form() {
 
   //option to login for existing users
 
-  echo "<p>If you are an existing user, login here. Otherwise fill out the section below.</p>";
+
   if(!is_user_logged_in()){
+    echo "<p>If you are an existing user, login here. Otherwise fill out the section below.</p>";
     wp_login_form();
   }
     echo '<div ><form action="' . esc_url( $_SERVER['REQUEST_URI'] ) . '" method="POST" class="wp-wc-warranty-registration">';
