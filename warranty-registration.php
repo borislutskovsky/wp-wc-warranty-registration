@@ -154,9 +154,9 @@ function wp_wc_wr_show_warranty_form() {
       Sincerely,
 
       The Catalinbread team.
-      ";
-      </p>
 
+      </p>
+      ";
       $body = str_replace("{{FIRST_NAME}}", $firstname, $body);
       $body = str_replace("{{LAST_NAME}}", $lastname, $body);
       $body = str_replace("{{PRODUCT}}", $product_name, $body);
