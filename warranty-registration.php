@@ -101,7 +101,7 @@ function wp_wc_wr_show_warranty_form() {
       if($product_id == 'other'){
         $product_id = -1;
       } else {
-        $product_name = $product->post_title;
+        $product_name = $product->post->post_title;
       }
 
       $ret = $wpdb->insert($wpdb->prefix . 'wc_wr_registrations', array(
