@@ -259,7 +259,7 @@ function wp_wc_wr_show_warranty_form() {
     <select name="wr-product" id="product" value="">
       <option value="-1"></option>
   ';
-    $args = array('post_type' => 'product', 'number_posts' => 1000, 'orderby' => 'post_title', 'order' => 'ASC');
+    $args = array('post_type' => 'product', 'numberposts' => -1, 'orderby' => 'title', 'order' => 'ASC');
     $products = get_posts($args);
     foreach($products as $p){
       echo '<option value="'.$p->ID.'" '.($p->ID == $product_id ? " selected " : "").' >'.$p->post_title.'</option>';
