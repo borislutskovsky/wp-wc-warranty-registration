@@ -81,7 +81,7 @@
                       LEFT OUTER JOIN {$wpdb->prefix}usermeta um_first_name ON (um_first_name.user_id = r.user_id AND um_first_name.meta_key = 'fist_name')
                       LEFT OUTER JOIN {$wpdb->prefix}usermeta um_last_name ON (um_last_name.user_id = r.user_id AND um_last_name.meta_key = 'last_name')";
         $query .= $wpdb->prepare(" WHERE  (u.user_login LIKE %s OR u.user_nicename LIKE %s
-                            OR u.user_email LIKE %s OR u.display_name LIKE %s 
+                            OR u.user_email LIKE %s OR u.display_name LIKE %s
                             OR r.serial_number LIKE %s OR um_first_name.meta_value LIKE %s
                             OR um_last_name.meta_value LIKE %s)",
                         $search, $search, $search, $search, $search, $search, $search);
@@ -89,6 +89,8 @@
       }
       if(!empty($orderby) & !empty($order)){
         $query.=' ORDER BY '.$orderby.' '.$order;
+      } else {
+        $query .= ' ORDER BY r.id DESC ';
       }
 
       $totalitems = $wpdb->query($query);
@@ -134,4 +136,3 @@
 
   </div>
 </div>
-
