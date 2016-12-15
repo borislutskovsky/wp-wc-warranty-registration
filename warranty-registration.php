@@ -322,6 +322,11 @@ function wp_wc_wr_admin_page(){
   add_submenu_page('wp-wc-warranty-registration', 'Warranty Registrations', 'Import', 'manage_options', 'wp_wc_wr_plugin_import', 'wp_wc_wr_plugin_import');
 }
 
+function wpdocs_set_html_mail_content_type() {
+    return 'text/html';
+}
+add_filter( 'wp_mail_content_type', 'wpdocs_set_html_mail_content_type' );
+
 function wp_wc_wr_plugin_import(){
   require('admin/import.php');
 }
