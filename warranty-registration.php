@@ -121,52 +121,31 @@ function wp_wc_wr_show_warranty_form() {
       $from = get_option('wc-wp-wr-email-from');
       $company = get_option('wc-wp-wr-company');
       $headers = "From: $company Warranty Registration <$from>\r\n";
-      // $msg_body_file = 'templates/warranty-registration-success-email.html';
-      // if(file_exists(get_template_directory()."/woocommerce/$msg_body_file")){
-      //   $msg_body_file = get_template_directory()."/woocommerce/$msg_body_file";
-      // } else {
-      //   $msg_body_file = plugins_url().'/wp-wc-warranty-registration/'.$msg_body_file;
-      // }
 
-      $body = "
+      $msg_body_file = 'templates/warranty-registration-success-email.html';
+      //die(get_template_directory()."/style.css");
+      //clearstatcache();
+      if(file_exists(get_template_directory()."/woocommerce/$msg_body_file")){
+        $msg_body_file = get_template_directory()."/woocommerce/$msg_body_file";
+      } else {
+        $msg_body_file = plugins_url().'/wp-wc-warranty-registration/'.$msg_body_file;
+      }
 
-      <p>Dear {{FIRST_NAME}} {{LAST_NAME}}, <br/><br/>
-
-
-      Thank you for registering your warranty coverage on your new $company {{PRODUCT}}. We hope you really like it.
-
-
-      </p>
-      <p>
-      All Catalinbread pedals enjoy a 7 year warranty to the original owner. The only exceptions are for comsetic damage, abuse and/or unauthorized modification. We will repair or replace your unit in the rare event it malfunctions, for free. There may be a charge for actual return shipping cost.
-      </p>
-      <p>
-      Save this email as proof of your registration.
-      </p>
-      <p>
-        Product: {{PRODUCT}}<br/>
-        S/N: {{SERIAL_NUMBER}}<br/>
-        Purchase date: {{PURCHASE_DATE}}<br/>
-        Purchase location: {{PURCHASE_LOCATION}}<br/>
-        Comments: {{COMMENTS}}
-      </p>
-
-      <p>
-      Sincerely,
-
-      The Catalinbread team.
-
-      </p>
-      ";
+      $body = file_get_contents($msg_body_file);
       $body = str_replace("{{FIRST_NAME}}", $firstname, $body);
       $body = str_replace("{{LAST_NAME}}", $lastname, $body);
+      $body = str_replace("{{COMPANY}}", $company, $body);
       $body = str_replace("{{PRODUCT}}", $product_name, $body);
       $body = str_replace("{{SERIAL_NUMBER}}", $serial_number, $body);
       $body = str_replace("{{PURCHASE_DATE}}", $purchasedate, $body);
       $body = str_replace("{{PURCHASE_LOCATION}}", $location, $body);
       $body = str_replace("{{COMMENTS}}", $comments, $body);
 
+die($body);
+
       $ret = wp_mail($email, $subject, $body, $headers);
+
+
 
     } else {
       $error_code = $user->get_error_code();
