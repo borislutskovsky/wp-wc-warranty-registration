@@ -123,8 +123,7 @@ function wp_wc_wr_show_warranty_form() {
       $headers = "From: $company Warranty Registration <$from>\r\n";
 
       $msg_body_file = 'templates/warranty-registration-success-email.html';
-      //die(get_template_directory()."/style.css");
-      //clearstatcache();
+
       if(file_exists(get_template_directory()."/woocommerce/$msg_body_file")){
         $msg_body_file = get_template_directory()."/woocommerce/$msg_body_file";
       } else {
@@ -141,12 +140,7 @@ function wp_wc_wr_show_warranty_form() {
       $body = str_replace("{{PURCHASE_LOCATION}}", $location, $body);
       $body = str_replace("{{COMMENTS}}", $comments, $body);
 
-die($body);
-
       $ret = wp_mail($email, $subject, $body, $headers);
-
-
-
     } else {
       $error_code = $user->get_error_code();
 
