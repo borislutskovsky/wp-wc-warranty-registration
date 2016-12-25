@@ -119,7 +119,8 @@ function wp_wc_wr_show_warranty_form() {
       //send email
       $subject = get_option('wc-wp-wr-email-subject');
       $from = get_option('wc-wp-wr-email-from');
-      $headers = "From: Catalinbread Warranty Registration <$from>\r\n";
+      $company = get_option('wc-wp-wr-company');
+      $headers = "From: $company Warranty Registration <$from>\r\n";
       // $msg_body_file = 'templates/warranty-registration-success-email.html';
       // if(file_exists(get_template_directory()."/woocommerce/$msg_body_file")){
       //   $msg_body_file = get_template_directory()."/woocommerce/$msg_body_file";
@@ -132,7 +133,7 @@ function wp_wc_wr_show_warranty_form() {
       <p>Dear {{FIRST_NAME}} {{LAST_NAME}}, <br/><br/>
 
 
-      Thank you for registering your warranty coverage on your new Catalinbread {{PRODUCT}}. We hope you really like it.
+      Thank you for registering your warranty coverage on your new $company {{PRODUCT}}. We hope you really like it.
 
 
       </p>
