@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Boris
- * Date: 1/8/2016
- * Time: 1:02 PM
- */
-
   class WCRegistrationsTable extends WP_List_Table {
 
     var $productFactory;
