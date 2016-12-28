@@ -268,7 +268,15 @@ function wp_wc_wr_show_warranty_form() {
     <select name="wr-product" id="product" value="">
       <option value="-1"></option>
   ';
-    $args = array('post_type' => 'product', 'numberposts' => -1, 'orderby' => 'title', 'order' => 'ASC');
+    $args = array('post_type' => 'product', 'numberposts' => -1, 'orderby' => 'title', 'order' => 'ASC', 'post_status' => 'publish');
+
+    $categories = get_option('wc-wp-wr-categories');
+    if(count($categories) !== 0){
+      $args['tax_query'] = array();
+      foreach($categories as $cat){
+        $args['tax_query'][] = array('taxonomy' => 'product_cat', 'field' => 'slug', 'terms' => $cat);
+      }
+    }
     $products = get_posts($args);
     foreach($products as $p){
       echo '<option value="'.$p->ID.'" '.($p->ID == $product_id ? " selected " : "").' >'.$p->post_title.'</option>';

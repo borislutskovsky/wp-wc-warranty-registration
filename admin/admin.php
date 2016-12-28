@@ -7,6 +7,7 @@
     update_option('wc-wp-wr-email-from', filter_input(INPUT_POST, 'wc-wp-wr-email-from'));
     update_option('wc-wp-wr-company', filter_input(INPUT_POST, 'wc-wp-wr-company'));
     update_option('wc-wp-wr-autousername', filter_input(INPUT_POST, 'wc-wp-wr-autousername'));
+    update_option('wc-wp-wr-categories',filter_input(INPUT_POST, 'wc-wp-wr-categories',FILTER_DEFAULT, FILTER_REQUIRE_ARRAY));
   }
 
 
@@ -15,6 +16,7 @@ $email_subject = get_option('wc-wp-wr-email-subject');
 $email_from = get_option('wc-wp-wr-email-from');
 $company = get_option('wc-wp-wr-company');
 $autousename = get_option('wc-wp-wr-autousername');
+$categories = get_option('wc-wp-wr-categories');
 
 $site_title = get_bloginfo();
 if($email_subject == ''){
@@ -50,7 +52,38 @@ if($email_subject == ''){
           <th scope="row">Auto-generate username</th>
           <td><input type="checkbox" name="wc-wp-wr-autousername" <?php if($autousename) echo ' checked '; ?> /></td>
         </tr>
+        <tr class="form-field">
+          <th scope="row"><label for="wc-wp-wr-categories">Include Categories</label></th>
+          <td><select name="wc-wp-wr-categories[]" id="" multiple>
 
+          <?php
+            $taxonomy     = 'product_cat';
+            $orderby      = 'name';
+            $show_count   = 0;      // 1 for yes, 0 for no
+            $pad_counts   = 0;      // 1 for yes, 0 for no
+            $hierarchical = 1;      // 1 for yes, 0 for no
+            $title        = '';
+            $empty        = 0;
+
+            $args = array(
+                   'taxonomy'     => $taxonomy,
+                   'orderby'      => $orderby,
+                   'show_count'   => $show_count,
+                   'pad_counts'   => $pad_counts,
+                   'hierarchical' => $hierarchical,
+                   'title_li'     => $title,
+                   'hide_empty'   => $empty
+            );
+           $all_categories = get_categories( $args );
+           foreach($all_categories as $cat){
+             $selected = array_search($cat->slug, $categories);
+
+             echo '<option value="'.$cat->slug.'"'. ($selected !== FALSE ? ' selected ' : '') . '>'.$cat->name.'</option>';
+           }
+?>
+
+          </select></td>
+        </tr>
       </tbody>
     </table>
     <p class="submit">
