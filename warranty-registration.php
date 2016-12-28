@@ -46,9 +46,23 @@ function wp_wc_warranty_registration_uninstall() {
 register_activation_hook(__FILE__, 'wp_wc_warranty_registration_install');
 register_uninstall_hook(__FILE__, 'wp_wc_warranty_registration_uninstall');
 
-function wp_wc_wr_generateUsername($firstname, $lastname){
+function wp_wc_wr_generateUsername($firstname, $lastname, $email){
   $username = '';
 
+  //check if email exists.
+  $user_id = email_exists($email);
+  if($user_id){
+    $user = get_userdata($user_id);
+    return $user->user_login;
+  }
+  $i = 1;
+  $username = "$firstname.$lastname";
+  $user_id = username_exists($username);
+  while($user_id){
+    $username .= "$i";
+    $user_id = username_exists($username);
+    $i++;
+  }
   return $username;
 }
 
@@ -57,11 +71,18 @@ function wp_wc_wr_show_warranty_form() {
   ob_start();
   wp_enqueue_style('wp-wc-warranty-registration', plugins_url('/warranty-registration.css', __FILE__));
 
+  $autousername = get_option('wc-wp-wr-autousername');
 
-  $username = sanitize_user( filter_input(INPUT_POST, 'wr-username'));
   $firstname = filter_input(INPUT_POST, 'wr-firstname');
   $lastname = filter_input(INPUT_POST, 'wr-lastname');
   $email = sanitize_email(filter_input(INPUT_POST, 'wr-email'));
+  if($autousername) {
+    $username = wp_wc_wr_generateUsername($firstname, $lastname, $email);
+  } else {
+    $username = sanitize_user( filter_input(INPUT_POST, 'wr-username'));
+  }
+
+//die($username);
   $address = filter_input(INPUT_POST, 'wr-address');
   $city = filter_input(INPUT_POST, 'wr-city');
   $state = filter_input(INPUT_POST, 'wr-state');
@@ -78,11 +99,21 @@ function wp_wc_wr_show_warranty_form() {
   if(isset($_POST['wr-submit']) && $_POST['wr-submit'] == 'Submit'){
 
     //process form
-    if(!is_user_logged_in()) {
-      $user = register_new_user( $username, $email );
+
+    if($autousername) {
+        $user = email_exists($email);
+
+        if(!$user){
+          $user = register_new_user($username, $email);
+        }
     } else {
-      $user = $current_user->ID;
+      if(!is_user_logged_in()) {
+        $user = register_new_user( $username, $email );
+      } else {
+        $user = $current_user->ID;
+      }
     }
+    //die(var_dump($user));
     $_pf = new WC_Product_Factory();
     $product = $_pf->get_product($product_id);
     if ( ! is_wp_error( $user ) ) {
@@ -115,7 +146,6 @@ function wp_wc_wr_show_warranty_form() {
         'created_date' => date('Y-m-d H:i:s')
       ));
 
-
       //send email
       $subject = get_option('wc-wp-wr-email-subject');
       $from = get_option('wc-wp-wr-email-from');
@@ -143,8 +173,6 @@ function wp_wc_wr_show_warranty_form() {
       $ret = wp_mail($email, $subject, $body, $headers);
     } else {
       $error_code = $user->get_error_code();
-
-      echo var_dump($error_code);
 
       $error = '<div class="error">'.$user->get_error_message().'</div>';
     }
@@ -183,11 +211,18 @@ function wp_wc_wr_show_warranty_form() {
     //show form
     echo '
   <fieldset>
-  <legend>'. (is_user_logged_in()?'About You':'New User').'  </legend>
+  <legend>'. (is_user_logged_in() || $autousername?'About You':'New User').'  </legend>';
+
+  if(!$autousername){
+    echo '
     <div class="controls">
       <label for="username">Username *:</label>
       <input type="text" name="wr-username" id="username" required value="'. (is_user_logged_in() ? $current_user->display_name : $username) .'" />
     </div>
+
+    ';
+  }
+    echo '
     <div class="controls">
       <label for="email">Email *:</label>
       <input type="email" name="wr-email" id="email" value="'.(is_user_logged_in() ? $current_user->get('user_email') : $email).'" />

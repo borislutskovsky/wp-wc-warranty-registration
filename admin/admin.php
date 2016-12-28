@@ -6,6 +6,7 @@
     update_option('wc-wp-wr-email-subject', filter_input(INPUT_POST, 'wc-wp-wr-email-subject'));
     update_option('wc-wp-wr-email-from', filter_input(INPUT_POST, 'wc-wp-wr-email-from'));
     update_option('wc-wp-wr-company', filter_input(INPUT_POST, 'wc-wp-wr-company'));
+    update_option('wc-wp-wr-autousername', filter_input(INPUT_POST, 'wc-wp-wr-autousername'));
   }
 
 
@@ -13,6 +14,7 @@ $newsletter = get_option('wc-wp-wr-newsletter');
 $email_subject = get_option('wc-wp-wr-email-subject');
 $email_from = get_option('wc-wp-wr-email-from');
 $company = get_option('wc-wp-wr-company');
+$autousename = get_option('wc-wp-wr-autousername');
 
 $site_title = get_bloginfo();
 if($email_subject == ''){
@@ -44,7 +46,10 @@ if($email_subject == ''){
           <th scope="row">Show newsletter subscription box</th>
           <td><input type="checkbox" name="wc-wp-wr-newsletter" <?php if($newsletter) echo ' checked'; ?> /></td>
         </tr>
-
+        <tr class="form-field">
+          <th scope="row">Auto-generate username</th>
+          <td><input type="checkbox" name="wc-wp-wr-autousername" <?php if($autousename) echo ' checked '; ?> /></td>
+        </tr>
 
       </tbody>
     </table>
