@@ -96,7 +96,13 @@ function wp_wc_wr_show_warranty_form() {
   $product_name = filter_input(INPUT_POST, 'wr-product-name');
   $serial_number = filter_input(INPUT_POST, 'wr-serialnumber');
 
-  if(isset($_POST['wr-submit']) && $_POST['wr-submit'] == 'Submit'){
+  if($product_id == -1 ||($product_id == 'other' && !$product_name)){
+
+    $error_code = 'no_product';
+    $error = 'Please select a product';
+  }
+
+  if(isset($_POST['wr-submit']) && $_POST['wr-submit'] == 'Submit' && ($product_id || $product_name)){
 
     //process form
     if($autousername) {
