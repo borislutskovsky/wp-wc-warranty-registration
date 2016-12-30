@@ -64,9 +64,9 @@
       $query = "SELECT r.* FROM {$wpdb->prefix}wc_wr_registrations r";
 
       $_orderby = filter_input(INPUT_GET, 'orderby');
-      $orderby = !empty($_orderby) ? mysqli_real_escape_string($_orderby) : 'ASC';
+      $orderby = !empty($_orderby) ? $wpdb->_real_escape($_orderby) : 'ASC';
       $_order = filter_input(INPUT_GET, 'order');
-      $order = !empty($_order) ? mysqli_real_escape_string($_orderby) : '';
+      $order = !empty($_order) ? $wpdb->_real_escape($_orderby) : '';
       $search = filter_input(INPUT_POST, 's');
       if(!empty($search) && $search != '') {
         $search = "%$search%";
@@ -90,7 +90,7 @@
       $perpage = 20;
 
       $_paged = filter_input(INPUT_GET, 'paged');
-      $paged = !empty($_paged) ? mysqli_real_escape_string($_paged) :'';
+      $paged = !empty($_paged) ? $wpdb->_real_escape($_paged) :'';
       if(empty($paged) || !is_numeric($paged) || $paged <= 0) { $paged = 1;}
       $totalpages = ceil($totalitems/$perpage);
 

@@ -99,7 +99,6 @@ function wp_wc_wr_show_warranty_form() {
   if(isset($_POST['wr-submit']) && $_POST['wr-submit'] == 'Submit'){
 
     //process form
-
     if($autousername) {
         $user = email_exists($email);
 
