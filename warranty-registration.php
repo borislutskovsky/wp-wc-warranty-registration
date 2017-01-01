@@ -18,7 +18,7 @@ function wp_wc_warranty_registration_install(){
   $charset_collate = $wpdb->get_charset_collate();
   $sql = "CREATE TABLE $table_name (
           id INT NOT NULL AUTO_INCREMENT,
-          user_id bigint(20) UNSIGNED NOT NULL,
+          user_id bigint(20) NOT NULL,
           first_name varchar(128) NOT NULL,
           last_name varchar(128) NOT NULL,
           email varchar(128) NOT NULL,
@@ -29,6 +29,12 @@ function wp_wc_warranty_registration_install(){
           purchase_location VARCHAR(128) NOT NULL,
           comments TEXT,
           created_date DATETIME NOT NULL,
+          address varchar(255)  NULL,
+          city varchar(128) NULL,
+          state varchar(64) NULL,
+          country varchar(128) NULL,
+          postal_code varchar(16) NULL,
+          phone varchar(16) NULL,
           PRIMARY KEY (id)
   ) $charset_collate;";
 
