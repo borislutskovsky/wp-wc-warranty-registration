@@ -127,7 +127,6 @@ function wp_wc_wr_show_warranty_form() {
     }
 
 
-    //die(var_dump($user));
     $_pf = new WC_Product_Factory();
     $product = $_pf->get_product($product_id);
     if ( ! is_wp_error( $user ) ) {

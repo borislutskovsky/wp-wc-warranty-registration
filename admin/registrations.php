@@ -76,8 +76,9 @@
         $query .= $wpdb->prepare(" WHERE  (u.user_login LIKE %s OR u.user_nicename LIKE %s
                             OR u.user_email LIKE %s OR u.display_name LIKE %s
                             OR r.serial_number LIKE %s OR um_first_name.meta_value LIKE %s
-                            OR um_last_name.meta_value LIKE %s)",
-                        $search, $search, $search, $search, $search, $search, $search);
+                            OR um_last_name.meta_value LIKE %s)
+                            OR r.email LIKE %s OR r.first_name LIKE %s OR r.last_name LIKE %s",
+                        $search, $search, $search, $search, $search, $search, $search, $search, $search, $search);
 
       }
       if(!empty($orderby) & !empty($order)){
