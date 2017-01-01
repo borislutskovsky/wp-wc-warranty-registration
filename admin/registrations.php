@@ -44,7 +44,10 @@
           return $item['id'];
         case 'user':
           $user = new WP_User($item['user_id']);
-          return "{$user->first_name} {$user->last_name}";
+          if($item['user_id'] != -1)
+            return "{$user->first_name} {$user->last_name}";
+          else
+            return $item['first_name'] . ' ' . $item['last_name'];
         case 'product':
           return $item['product_name'];
         default:
