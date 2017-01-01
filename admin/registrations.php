@@ -43,11 +43,12 @@
         case 'registration_id':
           return $item['id'];
         case 'user':
-          $user = new WP_User($item['user_id']);
-          if($item['user_id'] != -1)
+          if($item['user_id'] > 0) {
+            $user = new WP_User($item['user_id']);
             return "{$user->first_name} {$user->last_name}";
-          else
+          } else {
             return $item['first_name'] . ' ' . $item['last_name'];
+          }
         case 'product':
           return $item['product_name'];
         default:
@@ -73,14 +74,14 @@
       $search = filter_input(INPUT_POST, 's');
       if(!empty($search) && $search != '') {
         $search = "%$search%";
-        $query .= " INNER JOIN {$wpdb->prefix}users u ON (u.ID = r.user_id)
+        $query .= " LEFT OUTER JOIN {$wpdb->prefix}users u ON (u.ID = r.user_id)
                       LEFT OUTER JOIN {$wpdb->prefix}usermeta um_first_name ON (um_first_name.user_id = r.user_id AND um_first_name.meta_key = 'fist_name')
                       LEFT OUTER JOIN {$wpdb->prefix}usermeta um_last_name ON (um_last_name.user_id = r.user_id AND um_last_name.meta_key = 'last_name')";
         $query .= $wpdb->prepare(" WHERE  (u.user_login LIKE %s OR u.user_nicename LIKE %s
                             OR u.user_email LIKE %s OR u.display_name LIKE %s
                             OR r.serial_number LIKE %s OR um_first_name.meta_value LIKE %s
-                            OR um_last_name.meta_value LIKE %s)
-                            OR r.email LIKE %s OR r.first_name LIKE %s OR r.last_name LIKE %s",
+                            OR um_last_name.meta_value LIKE %s
+                            OR r.email LIKE %s OR r.first_name LIKE %s OR r.last_name LIKE %s )",
                         $search, $search, $search, $search, $search, $search, $search, $search, $search, $search);
 
       }
@@ -111,6 +112,7 @@
 
 
       $this->items = $wpdb->get_results($query, ARRAY_A);
+      
 
     }
 
