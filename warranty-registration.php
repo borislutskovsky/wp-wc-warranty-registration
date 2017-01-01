@@ -8,7 +8,7 @@
  * License: MIT
  */
 global $wp_wc_wr_version;
-$wp_wc_wr_version = '1.0';
+$wp_wc_wr_version = '1.1';
 
 
 function wp_wc_warranty_registration_install(){
@@ -19,6 +19,9 @@ function wp_wc_warranty_registration_install(){
   $sql = "CREATE TABLE $table_name (
           id INT NOT NULL AUTO_INCREMENT,
           user_id bigint(20) UNSIGNED NOT NULL,
+          first_name varchar(128) NOT NULL,
+          last_name varchar(128) NOT NULL,
+          email varchar(128) NOT NULL,
           product_id bigint(20) UNSIGNED ,
           product_name varchar(128),
           serial_number varchar(64) NOT NULL,
@@ -72,17 +75,17 @@ function wp_wc_wr_show_warranty_form() {
   wp_enqueue_style('wp-wc-warranty-registration', plugins_url('/warranty-registration.css', __FILE__));
 
   $autousername = get_option('wc-wp-wr-autousername');
-
+  $registerusers = get_option('wc-wp-wr-registerusers');
   $firstname = filter_input(INPUT_POST, 'wr-firstname');
   $lastname = filter_input(INPUT_POST, 'wr-lastname');
   $email = sanitize_email(filter_input(INPUT_POST, 'wr-email'));
+
   if($autousername) {
     $username = wp_wc_wr_generateUsername($firstname, $lastname, $email);
   } else {
     $username = sanitize_user( filter_input(INPUT_POST, 'wr-username'));
   }
 
-//die($username);
   $address = filter_input(INPUT_POST, 'wr-address');
   $city = filter_input(INPUT_POST, 'wr-city');
   $state = filter_input(INPUT_POST, 'wr-state');
@@ -105,34 +108,41 @@ function wp_wc_wr_show_warranty_form() {
   if(isset($_POST['wr-submit']) && $_POST['wr-submit'] == 'Submit' && ($product_id || $product_name)){
 
     //process form
-    if($autousername) {
-        $user = email_exists($email);
+    if($registerusers){
+      if($autousername) {
+          $user = email_exists($email);
 
-        if(!$user){
-          $user = register_new_user($username, $email);
-        }
-    } else {
-      if(!is_user_logged_in()) {
-        $user = register_new_user( $username, $email );
+          if(!$user){
+            $user = register_new_user($username, $email);
+          }
       } else {
-        $user = $current_user->ID;
+        if(!is_user_logged_in()) {
+          $user = register_new_user( $username, $email );
+        } else {
+          $user = $current_user->ID;
+        }
       }
+    } else {
+      $user = -1;
     }
+
+
     //die(var_dump($user));
     $_pf = new WC_Product_Factory();
     $product = $_pf->get_product($product_id);
     if ( ! is_wp_error( $user ) ) {
 
       //save user meta
-      update_user_meta($user, 'first_name', $firstname);
-      update_user_meta($user, 'last_name', $lastname);
-      update_user_meta($user, 'address', $address);
-      update_user_meta($user, 'city', $city);
-      update_user_meta($user, 'state', $state);
-      update_user_meta($user, 'country', $country);
-      update_user_meta($user, 'postalcode', $postalcode);
-      update_user_meta($user, 'phone', $phone);
-
+      if($registerusers){
+        update_user_meta($user, 'first_name', $firstname);
+        update_user_meta($user, 'last_name', $lastname);
+        update_user_meta($user, 'address', $address);
+        update_user_meta($user, 'city', $city);
+        update_user_meta($user, 'state', $state);
+        update_user_meta($user, 'country', $country);
+        update_user_meta($user, 'postalcode', $postalcode);
+        update_user_meta($user, 'phone', $phone);
+      }
       //save registration:
       if($product_id == 'other'){
         $product_id = -1;
@@ -148,7 +158,16 @@ function wp_wc_wr_show_warranty_form() {
         'purchase_date' => date('Y-m-d', strtotime($purchasedate)),
         'purchase_location' => $location,
         'comments' => $comments,
-        'created_date' => date('Y-m-d H:i:s')
+        'created_date' => date('Y-m-d H:i:s'),
+        'first_name' => $firstname,
+        'last_name' => $lastname,
+        'email' => $email,
+        'address' => $address,
+        'city' => $city,
+        'state' => $state,
+        'country' => $country,
+        'postal_code' => $postalcode,
+        'phone' => $phone
       ));
 
       //send email

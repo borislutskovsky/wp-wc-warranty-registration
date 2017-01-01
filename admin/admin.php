@@ -8,6 +8,7 @@
     update_option('wc-wp-wr-company', filter_input(INPUT_POST, 'wc-wp-wr-company'));
     update_option('wc-wp-wr-autousername', filter_input(INPUT_POST, 'wc-wp-wr-autousername'));
     update_option('wc-wp-wr-categories',filter_input(INPUT_POST, 'wc-wp-wr-categories',FILTER_DEFAULT, FILTER_REQUIRE_ARRAY));
+    update_option('wc-wp-wr-registerusers', filter_input(INPUT_POST, 'wc-wp-wr-registerusers'));
   }
 
 
@@ -17,6 +18,7 @@ $email_from = get_option('wc-wp-wr-email-from');
 $company = get_option('wc-wp-wr-company');
 $autousename = get_option('wc-wp-wr-autousername');
 $categories = get_option('wc-wp-wr-categories');
+$registerusers = get_option('wc-wp-wr-registerusers');
 
 $site_title = get_bloginfo();
 if($email_subject == ''){
@@ -47,6 +49,10 @@ if($email_subject == ''){
         <tr class="form-field">
           <th scope="row">Show newsletter subscription box</th>
           <td><input type="checkbox" name="wc-wp-wr-newsletter" <?php if($newsletter) echo ' checked'; ?> /></td>
+        </tr>
+        <tr class="form-field">
+          <th scope="row">Register users</th>
+          <td><input type="checkbox" name="wc-wp-wr-registerusers" <?php if($registerusers) echo ' checked '; ?>></td>
         </tr>
         <tr class="form-field">
           <th scope="row">Auto-generate username</th>
