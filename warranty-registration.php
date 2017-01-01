@@ -297,7 +297,7 @@ function wp_wc_wr_show_warranty_form() {
 
     $categories = get_option('wc-wp-wr-categories');
     if(count($categories) !== 0){
-      $args['tax_query'] = array();
+      $args['tax_query'] = array('relation' => 'OR');
       foreach($categories as $cat){
         $args['tax_query'][] = array('taxonomy' => 'product_cat', 'field' => 'slug', 'terms' => $cat);
       }
