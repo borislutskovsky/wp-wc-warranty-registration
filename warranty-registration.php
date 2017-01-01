@@ -214,9 +214,7 @@ function wp_wc_wr_show_warranty_form() {
   }
 
   //option to login for existing users
-
-
-  if(!is_user_logged_in()){
+  if(!is_user_logged_in() && $registerusers){
     echo "<p>If you are an existing user, login here. Otherwise fill out the section below.</p>";
     wp_login_form();
   }
@@ -234,9 +232,9 @@ function wp_wc_wr_show_warranty_form() {
     //show form
     echo '
   <fieldset>
-  <legend>'. (is_user_logged_in() || $autousername?'About You':'New User').'  </legend>';
+  <legend>About You</legend>';
 
-  if(!$autousername){
+  if(!$autousername && $registerusers){
     echo '
     <div class="controls">
       <label for="username">Username *:</label>
