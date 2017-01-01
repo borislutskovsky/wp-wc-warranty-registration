@@ -110,111 +110,113 @@ function wp_wc_wr_show_warranty_form() {
     $error_code = 'no_product';
     $error = 'Please select a product';
   }
+  if(isset($_POST['wp-wc-warranty-registration-nonce']) || wp_verify_nonce($_POST['wp-wc-warranty-registration-nonce'], 'wp-wc-warranty-registration')) {    
 
-  if(isset($_POST['wr-submit']) && $_POST['wr-submit'] == 'Submit' && ($product_id || $product_name)){
+    if(isset($_POST['wr-submit']) && $_POST['wr-submit'] == 'Submit' && ($product_id || $product_name)){
 
-    //process form
-    if($registerusers){
-      if($autousername) {
-          $user = email_exists($email);
-
-          if(!$user){
-            $user = register_new_user($username, $email);
-          }
-      } else {
-        if(!is_user_logged_in()) {
-          $user = register_new_user( $username, $email );
-        } else {
-          $user = $current_user->ID;
-        }
-      }
-    } else {
-      $user = -1;
-    }
-    $_pf = new WC_Product_Factory();
-    $product = $_pf->get_product($product_id);
-    if ( ! is_wp_error( $user ) ) {
-
-      //save user meta
+      //process form
       if($registerusers){
-        update_user_meta($user, 'first_name', $firstname);
-        update_user_meta($user, 'last_name', $lastname);
-        update_user_meta($user, 'address', $address);
-        update_user_meta($user, 'city', $city);
-        update_user_meta($user, 'state', $state);
-        update_user_meta($user, 'country', $country);
-        update_user_meta($user, 'postalcode', $postalcode);
-        update_user_meta($user, 'phone', $phone);
-      }
-      //save registration:
-      if($product_id == 'other'){
-        $product_id = -1;
+        if($autousername) {
+            $user = email_exists($email);
+
+            if(!$user){
+              $user = register_new_user($username, $email);
+            }
+        } else {
+          if(!is_user_logged_in()) {
+            $user = register_new_user( $username, $email );
+          } else {
+            $user = $current_user->ID;
+          }
+        }
       } else {
-        $product_name = $product->post->post_title;
+        $user = -1;
       }
+      $_pf = new WC_Product_Factory();
+      $product = $_pf->get_product($product_id);
+      if ( ! is_wp_error( $user ) ) {
 
-      $ret = $wpdb->insert($wpdb->prefix . 'wc_wr_registrations', array(
-        'user_id' => $user,
-        'product_id' => $product_id,
-        'product_name' => $product_name,
-        'serial_number' => $serial_number,
-        'purchase_date' => date('Y-m-d', strtotime($purchasedate)),
-        'purchase_location' => $location,
-        'comments' => $comments,
-        'created_date' => date('Y-m-d H:i:s'),
-        'first_name' => $firstname,
-        'last_name' => $lastname,
-        'email' => $email,
-        'address' => $address,
-        'city' => $city,
-        'state' => $state,
-        'country' => $country,
-        'postal_code' => $postalcode,
-        'phone' => $phone
-      ));
+        //save user meta
+        if($registerusers){
+          update_user_meta($user, 'first_name', $firstname);
+          update_user_meta($user, 'last_name', $lastname);
+          update_user_meta($user, 'address', $address);
+          update_user_meta($user, 'city', $city);
+          update_user_meta($user, 'state', $state);
+          update_user_meta($user, 'country', $country);
+          update_user_meta($user, 'postalcode', $postalcode);
+          update_user_meta($user, 'phone', $phone);
+        }
+        //save registration:
+        if($product_id == 'other'){
+          $product_id = -1;
+        } else {
+          $product_name = $product->post->post_title;
+        }
 
-      //send email
-      $subject = get_option('wc-wp-wr-email-subject');
-      $from = get_option('wc-wp-wr-email-from');
-      $company = get_option('wc-wp-wr-company');
-      $headers = "From: $company Warranty Registration <$from>\r\n";
+        $ret = $wpdb->insert($wpdb->prefix . 'wc_wr_registrations', array(
+          'user_id' => $user,
+          'product_id' => $product_id,
+          'product_name' => $product_name,
+          'serial_number' => $serial_number,
+          'purchase_date' => date('Y-m-d', strtotime($purchasedate)),
+          'purchase_location' => $location,
+          'comments' => $comments,
+          'created_date' => date('Y-m-d H:i:s'),
+          'first_name' => $firstname,
+          'last_name' => $lastname,
+          'email' => $email,
+          'address' => $address,
+          'city' => $city,
+          'state' => $state,
+          'country' => $country,
+          'postal_code' => $postalcode,
+          'phone' => $phone
+        ));
 
-      $msg_body_file = 'templates/warranty-registration-success-email.html';
+        //send email
+        $subject = get_option('wc-wp-wr-email-subject');
+        $from = get_option('wc-wp-wr-email-from');
+        $company = get_option('wc-wp-wr-company');
+        $headers = "From: $company Warranty Registration <$from>\r\n";
 
-      if(file_exists(get_template_directory()."/woocommerce/$msg_body_file")){
-        $msg_body_file = get_template_directory()."/woocommerce/$msg_body_file";
+        $msg_body_file = 'templates/warranty-registration-success-email.html';
+
+        if(file_exists(get_template_directory()."/woocommerce/$msg_body_file")){
+          $msg_body_file = get_template_directory()."/woocommerce/$msg_body_file";
+        } else {
+          $msg_body_file = plugins_url().'/wp-wc-warranty-registration/'.$msg_body_file;
+        }
+
+        $body = file_get_contents($msg_body_file);
+        $body = str_replace("{{FIRST_NAME}}", $firstname, $body);
+        $body = str_replace("{{LAST_NAME}}", $lastname, $body);
+        $body = str_replace("{{COMPANY}}", $company, $body);
+        $body = str_replace("{{PRODUCT}}", $product_name, $body);
+        $body = str_replace("{{SERIAL_NUMBER}}", $serial_number, $body);
+        $body = str_replace("{{PURCHASE_DATE}}", $purchasedate, $body);
+        $body = str_replace("{{PURCHASE_LOCATION}}", $location, $body);
+        $body = str_replace("{{COMMENTS}}", $comments, $body);
+
+        $ret = wp_mail($email, $subject, $body, $headers);
       } else {
-        $msg_body_file = plugins_url().'/wp-wc-warranty-registration/'.$msg_body_file;
+        $error_code = $user->get_error_code();
+
+        $error = '<div class="error">'.$user->get_error_message().'</div>';
+      }
+    }
+    if(isset($ret) && $ret){
+
+      $thankyou_file = 'templates/warranty-registration-thank-you.php';
+      if(file_exists(get_template_directory()."/woocommerce/$thankyou_file")){
+        require_once(get_template_directory()."/woocommerce/$thankyou_file");
+      } else {
+        require_once($thankyou_file);
       }
 
-      $body = file_get_contents($msg_body_file);
-      $body = str_replace("{{FIRST_NAME}}", $firstname, $body);
-      $body = str_replace("{{LAST_NAME}}", $lastname, $body);
-      $body = str_replace("{{COMPANY}}", $company, $body);
-      $body = str_replace("{{PRODUCT}}", $product_name, $body);
-      $body = str_replace("{{SERIAL_NUMBER}}", $serial_number, $body);
-      $body = str_replace("{{PURCHASE_DATE}}", $purchasedate, $body);
-      $body = str_replace("{{PURCHASE_LOCATION}}", $location, $body);
-      $body = str_replace("{{COMMENTS}}", $comments, $body);
 
-      $ret = wp_mail($email, $subject, $body, $headers);
-    } else {
-      $error_code = $user->get_error_code();
-
-      $error = '<div class="error">'.$user->get_error_message().'</div>';
+      return ob_get_clean();
     }
-  }
-  if(isset($ret) && $ret){
-
-    $thankyou_file = 'templates/warranty-registration-thank-you.php';
-    if(file_exists(get_template_directory()."/woocommerce/$thankyou_file")){
-      require_once(get_template_directory()."/woocommerce/$thankyou_file");
-    } else {
-      require_once($thankyou_file);
-    }
-
-
-    return ob_get_clean();
   }
 
   //option to login for existing users
@@ -341,6 +343,7 @@ function wp_wc_wr_show_warranty_form() {
 
   </div>';
   }
+  wp_nonce_field('wp-wc-warranty-registration', 'wp-wc-warranty-registration-nonce');
   echo '
   <input type="submit" value="Submit" name="wr-submit"/>
 </form>
