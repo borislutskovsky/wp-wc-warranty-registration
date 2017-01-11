@@ -110,7 +110,7 @@ function wp_wc_wr_show_warranty_form() {
     $error_code = 'no_product';
     $error = 'Please select a product';
   }
-  if(isset($_POST['wp-wc-warranty-registration-nonce']) || wp_verify_nonce($_POST['wp-wc-warranty-registration-nonce'], 'wp-wc-warranty-registration')) {    
+  if(isset($_POST['wp-wc-warranty-registration-nonce']) || wp_verify_nonce($_POST['wp-wc-warranty-registration-nonce'], 'wp-wc-warranty-registration')) {
 
     if(isset($_POST['wr-submit']) && $_POST['wr-submit'] == 'Submit' && ($product_id || $product_name)){
 
@@ -198,14 +198,14 @@ function wp_wc_wr_show_warranty_form() {
         $body = str_replace("{{PURCHASE_LOCATION}}", $location, $body);
         $body = str_replace("{{COMMENTS}}", $comments, $body);
 
-        $ret = wp_mail($email, $subject, $body, $headers);
+        $emailret = wp_mail($email, $subject, $body, $headers);
       } else {
         $error_code = $user->get_error_code();
 
         $error = '<div class="error">'.$user->get_error_message().'</div>';
       }
     }
-    if(isset($ret) && $ret){
+    if($ret){
 
       $thankyou_file = 'templates/warranty-registration-thank-you.php';
       if(file_exists(get_template_directory()."/woocommerce/$thankyou_file")){
